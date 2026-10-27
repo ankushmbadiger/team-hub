@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Settings · TeamHub{% endblock %}
+{% block page_id %}settings{% endblock %}
+{% block heading %}Settings{% endblock %}
+
+{% block content %}
+<h1>Settings</h1>
+
+<section class="card" aria-labelledby="profile">
+  <h2 id="profile">Profile</h2>
+  <form method="post" action="/settings/profile/">
+    {% csrf_token %}
+    <div class="field"><label for="first_name">First name</label><input id="first_name" name="first_name" type="text" value="{{ user.first_name }}"></div>
+    <div class="field"><label for="last_name">Last name</label><input id="last_name" name="last_name" type="text" value="{{ user.last_name }}"></div>
+    <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" value="{{ user.email }}"></div>
+    <button class="btn btn--primary" type="submit">Save profile</button>
+  </form>
+</section>
+
+<section class="card" aria-labelledby="password">
+  <h2 id="password">Change password</h2>
+  <form method="post" action="/settings/password/">
+    {% csrf_token %}
+    <div class="field"><label for="old_password">Current password</label><input id="old_password" name="old_password" type="password" autocomplete="current-password" required></div>
+    <div class="field"><label for="new_password1">New password</label><input id="new_password1" name="new_password1" type="password" autocomplete="new-password" required></div>
+    <div class="field"><label for="new_password2">Confirm new password</label><input id="new_password2" name="new_password2" type="password" autocomplete="new-password" required></div>
+    <button class="btn btn--primary" type="submit">Change password</button>
+  </form>
+</section>
+
+<section class="card" aria-labelledby="notifs">
+  <h2 id="notifs">Notifications</h2>
+  <form method="post" action="/settings/notifications/">
+    {% csrf_token %}
+    <label class="toggle"><input type="checkbox" name="notify_messages" checked> Notify me about new messages</label>
+    <label class="toggle"><input type="checkbox" name="notify_files" checked> Notify me when files are shared</label>
+    <button class="btn btn--primary" type="submit">Save preferences</button>
+  </form>
+</section>
+
+<section class="card" aria-labelledby="theme">
+  <h2 id="theme">Theme</h2>
+  <!-- Saved in the browser only (localStorage), handled by main.js -->
+  <div class="field">
+    <label for="theme-select">Appearance</label>
+    <select id="theme-select" data-theme-select>
+      <option value="dark">Dark</option><option value="light">Light</option><option value="system">Match my device</option>
+    </select>
+  </div>
+</section>
+{% endblock %}

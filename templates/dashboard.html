@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard · TeamHub{% endblock %}
+{% block page_id %}dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Welcome back, {{ user.first_name|default:user.username }}</h1>
+
+<div class="grid grid--4">
+  <a class="card card--link" href="/chat/"><h2>Chat</h2><p class="muted">Catch up with the team</p></a>
+  <a class="card card--link" href="/files/"><h2>Shared Files</h2><p class="muted">Upload and download</p></a>
+  <a class="card card--link" href="/team/"><h2>Team Members</h2><p class="muted">{{ member_count|default:0 }} members</p></a>
+  <a class="card card--link" href="/settings/"><h2>Settings</h2><p class="muted">Profile and preferences</p></a>
+</div>
+
+<div class="grid grid--2">
+  <section class="card" aria-labelledby="recent-msgs">
+    <h2 id="recent-msgs">Recent messages</h2>
+    <ul class="list">
+      <!-- DJANGO: view passes recent_messages -->
+      {% for m in recent_messages %}
+      <li><strong>{{ m.sender.username }}</strong> in #{{ m.room.name }}: {{ m.content|truncatechars:80 }}
+        <span class="muted">{{ m.created_at|timesince }} ago</span></li>
+      {% empty %}
+      <li class="state">No messages yet. Say hello in #general.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="card" aria-labelledby="recent-files">
+    <h2 id="recent-files">Recent files</h2>
+    <ul class="list">
+      <!-- DJANGO: view passes recent_files -->
+      {% for f in recent_files %}
+      <li>{{ f.name }} <span class="muted">by {{ f.uploaded_by.username }}, {{ f.uploaded_at|timesince }} ago</span></li>
+      {% empty %}
+      <li class="state">No files shared yet. Upload the first one.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

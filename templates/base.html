@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}TeamHub{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+  <script src="{% static 'js/main.js' %}" defer></script>
+</head>
+<!-- DJANGO: data-role comes from the server; real authorization must still be enforced in views -->
+<body data-page="{% block page_id %}{% endblock %}" data-role="{% if user.is_staff %}admin{% else %}member{% endif %}">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <a class="brand" href="/dashboard/">TeamHub</a>
+      <nav class="sidebar__nav">
+        <a class="nav-link" data-nav="dashboard" href="/dashboard/">Dashboard</a>
+        <a class="nav-link" data-nav="chat" href="/chat/">Chat</a>
+        <a class="nav-link" data-nav="files" href="/files/">Shared Files</a>
+        <a class="nav-link" data-nav="team" href="/team/">Team Members</a>
+        <a class="nav-link" data-nav="settings" href="/settings/">Settings</a>
+      </nav>
+      <div class="sidebar__user">
+        <span class="avatar" aria-hidden="true">{{ user.username|slice:":2"|upper }}</span>
+        <span class="sidebar__name">{{ user.get_full_name|default:user.username }}</span>
+        <!-- Django 5+ requires logout via POST -->
+        <form method="post" action="/accounts/logout/">
+          {% csrf_token %}
+          <button class="btn btn--ghost btn--small" type="submit">Log out</button>
+        </form>
+      </div>
+    </aside>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="icon-btn" type="button" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">☰</button>
+        <span class="topbar__title">{% block heading %}{% endblock %}</span>
+      </header>
+
+      {% if messages %}
+      <ul class="toasts" role="status">
+        {% for message in messages %}
+        <li class="toast toast--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <main class="content" id="main">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

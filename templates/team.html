@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Team Members · TeamHub{% endblock %}
+{% block page_id %}team{% endblock %}
+{% block heading %}Team Members{% endblock %}
+
+{% block content %}
+<h1>Team members</h1>
+
+<div class="grid grid--3">
+  <!-- DJANGO: view passes members (User queryset) -->
+  {% for m in members %}
+  <article class="card member">
+    <span class="avatar avatar--large" aria-hidden="true">{{ m.username|slice:":2"|upper }}</span>
+    <h2>{{ m.get_full_name|default:m.username }}</h2>
+    <span class="badge {% if m.is_staff %}badge--admin{% endif %}">{% if m.is_staff %}Admin{% else %}Member{% endif %}</span>
+    <!-- DJANGO: set data-online="true" from presence data -->
+    <span class="status" data-online="false">Offline</span>
+  </article>
+  {% empty %}
+  <p class="state">No members yet. Add the first one below.</p>
+  {% endfor %}
+</div>
+
+<!-- Hidden for non-admins by CSS. The view that handles this POST MUST check is_staff. -->
+<section class="card admin-only" aria-labelledby="add-member">
+  <h2 id="add-member">Add a member</h2>
+  <form method="post" action="/team/add/">
+    {% csrf_token %}
+    <div class="field"><label for="new-username">Username</label><input id="new-username" name="username" type="text" required></div>
+    <div class="field"><label for="new-email">Email</label><input id="new-email" name="email" type="email" required></div>
+    <div class="field"><label for="new-password">Temporary password</label><input id="new-password" name="password" type="password" autocomplete="new-password" required></div>
+    <div class="field">
+      <label for="new-role">Role</label>
+      <select id="new-role" name="role"><option value="member">Member</option><option value="admin">Admin</option></select>
+    </div>
+    <button class="btn btn--primary" type="submit">Add member</button>
+  </form>
+</section>
+{% endblock %}

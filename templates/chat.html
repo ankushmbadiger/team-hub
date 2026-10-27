@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Chat · TeamHub{% endblock %}
+{% block page_id %}chat{% endblock %}
+{% block heading %}Chat{% endblock %}
+
+{% block content %}
+<!-- JS reads these data-* attributes. The server sets them; never trust them for authorization. -->
+<div class="chat" data-room="{{ room.slug|default:'general' }}" data-current-user="{{ user.username }}"
+     data-ws-path="/ws/chat/{{ room.slug|default:'general' }}/">
+  <aside class="chat__rooms" aria-label="Channels">
+    <h2>Channels</h2>
+    <ul>
+      <!-- DJANGO: view passes rooms the user belongs to -->
+      {% for r in rooms %}
+      <li><a class="chat__room {% if r == room %}is-active{% endif %}" href="/chat/{{ r.slug }}/"># {{ r.name }}</a></li>
+      {% empty %}
+      <li><a class="chat__room is-active" href="/chat/general/"># general</a></li>
+      <li><a class="chat__room" href="/chat/project-updates/"># project-updates</a></li>
+      <li><a class="chat__room" href="/chat/random/"># random</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <section class="chat__main" aria-label="Conversation">
+    <header class="chat__header">
+      <h1># {{ room.name|default:"general" }}</h1>
+      <span class="conn" id="conn-status" data-state="connecting" role="status">Connecting…</span>
+    </header>
+
+    <div class="chat__messages" id="message-list" aria-live="polite">
+      <p class="state" id="chat-loading">Loading messages…</p>
+    </div>
+
+    <form class="chat__form" id="chat-form" autocomplete="off">
+      <label class="sr-only" for="chat-input">Message</label>
+      <input id="chat-input" name="message" type="text" maxlength="2000" placeholder="Message #{{ room.name|default:'general' }}" required>
+      <button class="btn btn--primary" type="submit">Send</button>
+    </form>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}<script src="{% static 'js/chat.js' %}" defer></script>{% endblock %}

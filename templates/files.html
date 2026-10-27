@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Shared Files · TeamHub{% endblock %}
+{% block page_id %}files{% endblock %}
+{% block heading %}Shared Files{% endblock %}
+
+{% block content %}
+<h1>Shared files</h1>
+
+<form class="card upload" id="upload-form" method="post" action="/files/upload/" enctype="multipart/form-data" data-max-mb="25">
+  {% csrf_token %}
+  <label class="btn btn--ghost" for="file-input">Choose a file</label>
+  <input class="sr-only" id="file-input" name="file" type="file" required>
+  <span class="muted" id="file-name">No file selected</span>
+  <button class="btn btn--primary" type="submit">Upload</button>
+  <p class="form-error" id="upload-error" role="alert" hidden></p>
+</form>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Uploaded by</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody>
+      <!-- DJANGO: view passes files (metadata from PostgreSQL; contents live in Google Drive) -->
+      {% for f in files %}
+      <tr>
+        <td>{{ f.name }}</td>
+        <td>{{ f.content_type }}</td>
+        <td>{{ f.size|filesizeformat }}</td>
+        <td>{{ f.uploaded_by.username }}</td>
+        <td>{{ f.uploaded_at|date:"M j, Y H:i" }}</td>
+        <td class="table__actions">
+          <a class="btn btn--ghost btn--small" href="/files/{{ f.pk }}/preview/">Preview</a>
+          <a class="btn btn--ghost btn--small" href="/files/{{ f.pk }}/download/">Download</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="state">No files yet. Choose a file above to share it with the team.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}<script src="{% static 'js/files.js' %}" defer></script>{% endblock %}
